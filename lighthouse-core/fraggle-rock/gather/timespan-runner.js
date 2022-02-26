@@ -32,12 +32,11 @@ async function startTimespan(options) {
   /** @type {Map<string, LH.ArbitraryEqualityMap>} */
   const computedCache = new Map();
   const artifactDefinitions = config.artifacts || [];
-  const requestedUrl = await driver.url();
+  const requestedUrl = await options.page.url();
   const baseArtifacts = await getBaseArtifacts(config, driver, {gatherMode: 'timespan'});
   const artifactState = getEmptyArtifactState();
   /** @type {Omit<import('./runner-helpers.js').CollectPhaseArtifactOptions, 'phase'>} */
   const phaseOptions = {
-    url: requestedUrl,
     driver,
     artifactDefinitions,
     artifactState,
@@ -53,9 +52,7 @@ async function startTimespan(options) {
 
   return {
     async endTimespan() {
-      const finalUrl = await driver.url();
-      phaseOptions.url = finalUrl;
-
+      const finalUrl = await options.page.url();
       const runnerOptions = {config, computedCache};
       const artifacts = await Runner.gather(
         async () => {
